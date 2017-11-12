@@ -1,6 +1,6 @@
-## React-Expense-App
+## React-Boilerplate-v2
 
-Created using React-Router, React-Redux. 
+Created using React-Router, React-Redux.
 
 ### Markdown for reference :wink:
 
