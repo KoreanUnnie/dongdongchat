@@ -1,32 +1,22 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
+import Drawer from '@material-ui/core/Drawer';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import List from '@material-ui/core/List';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import Hidden from '@material-ui/core/Hidden';
+import Divider from '@material-ui/core/Divider';
 import MenuIcon from '@material-ui/icons/Menu';
-import Drawer from '@material-ui/core/Drawer'
-import ListSubheader from '@material-ui/core/ListSubheader';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import Collapse from '@material-ui/core/Collapse';
-import InboxIcon from '@material-ui/icons/MoveToInbox';
-import ExpandLess from '@material-ui/icons/ExpandLess';
-import ExpandMore from '@material-ui/icons/ExpandMore';
-
 
 const drawerWidth = 240;
 
 const styles = theme => ({
-  nested: {
-    paddingLeft: theme.spacing.unit * 4,
-  },
   root: {
     flexGrow: 1,
+    height: 430,
     zIndex: 1,
     overflow: 'hidden',
     position: 'relative',
@@ -34,10 +24,8 @@ const styles = theme => ({
     width: '100%',
   },
   appBar: {
-    position: 'fixed',
+    position: 'absolute',
     marginLeft: drawerWidth,
-    background: 'pink',
-    fontWeight: '300',
     [theme.breakpoints.up('md')]: {
       width: `calc(100% - ${drawerWidth}px)`,
     },
@@ -58,15 +46,12 @@ const styles = theme => ({
     flexGrow: 1,
     backgroundColor: theme.palette.background.default,
     padding: theme.spacing.unit * 3,
-    height: '100%',
-    paddingBottom: 66
   },
 });
 
-class Header extends React.Component {
+class ResponsiveDrawer extends React.Component {
   state = {
     mobileOpen: false,
-    chatsOpen: false
   };
 
   handleDrawerToggle = () => {
@@ -75,52 +60,63 @@ class Header extends React.Component {
 
   render() {
     const { classes, theme } = this.props;
-    const { chats, activeChat, setActiveChat, logout } = this.props
-    const drawer = (
-      <List
-        component="nav"
-        subheader={<ListSubheader component="div">Available Chatrooms</ListSubheader>}
-      >
-          {
-          chats.map((chat, chatIndex)=>{
-            if(chat.name){
-              let lastMessage = {message: ''}
-              if(chat.messages[chat.messages.length - 1] && chat.messages[chat.messages.length - 1].message){
-                lastMessage = chat.messages[chat.messages.length - 1];
-              }
+		const { name, online, numberOfUsers } = this.props
+		const onlineText = online ? 'online':'offline'
+		const drawerRender = (
+		 <div id="side-bar">
+				 <div className="heading">
+					 <div className="app-name">Zanjo Chat <FAChevronDown /></div>
+					 <div className="menu">
+						 <FAMenu />
+					 </div>
+				 </div>
+				 <div className="search">
+					 <i className="search-icon"><FASearch /></i>
+					 <input placeholder="Search" type="text"/>
+					 <div className="plus"></div>
+				 </div>
+				 <div
+					 className="users"
+					 ref='users'
+					 onClick={(e)=>{ (e.target === this.refs.user) && setActiveChat(null) }}>
 
-              const user = chat.users.find(({name})=>{
-                return name !== this.props.name
-              }) || { name:"Community" }
-              const classNames = (activeChat && activeChat.id === chat.id) ? 'active' : ''
-              return(
-                <List key={chatIndex}>
-                <ListItem button ref='users' onClick={(e)=>{ this.setState(state=>({chatsOpen: !state.chatsOpen})); }}>
-                  <ListItemIcon>
-                    <InboxIcon />
-                  </ListItemIcon>
-                  <ListItemText inset primary={`${user.name}`} />
-                  {this.state.chatsOpen ? <ExpandLess /> : <ExpandMore />}
-                </ListItem>
-                <Collapse in={this.state.chatsOpen} timeout="auto" unmountOnExit>
-                  <List component="div" disablePadding onClick={ ()=>{ setActiveChat(chat) } }>
-                    <ListItem button className={classes.nested}>
-                      <ListItemText inset primary={`${lastMessage.message}`} />
-                    </ListItem>
-                  </List>
-              </Collapse>
-              </List>
-            )
-            }
+					 {
+					 chats.map((chat)=>{
+						 if(chat.name){
+							 const lastMessage = chat.messages[chat.messages.length - 1];
+							 const user = chat.users.find(({name})=>{
+								 return name !== this.props.name
+							 }) || { name:"Community" }
+							 const classNames = (activeChat && activeChat.id === chat.id) ? 'active' : ''
+							 return(
+							 <div
+								 key={chat.id}
+								 className={`user ${classNames}`}
+								 onClick={ ()=>{ setActiveChat(chat) } }
+								 >
+								 <div className="user-photo">{user.name[0].toUpperCase()}</div>
+								 <div className="user-info">
+									 <div className="name">{user.name}</div>
+									 {lastMessage && <div className="last-message">{lastMessage.message}</div>}
+								 </div>
 
-            return null
-          })
-          }
+							 </div>
+						 )
+						 }
 
+						 return null
+					 })
+					 }
 
-           <div onClick={()=>{logout()}} title="Logout" className="logout" />
-        </List>
-   )
+				 </div>
+				 <div className="current-user">
+					 <span>{user.name}</span>
+					 <div onClick={()=>{logout()}} title="Logout" className="logout">
+						 <MdEject/>
+					 </div>
+				 </div>
+			 </div>
+	 )
 
     return (
       <div className={classes.root}>
@@ -135,7 +131,7 @@ class Header extends React.Component {
               <MenuIcon />
             </IconButton>
             <Typography variant="title" color="inherit" noWrap>
-            DongDong Chat
+              {name} <i>{onlineText}</i> {numberOfUsers}
             </Typography>
           </Toolbar>
         </AppBar>
@@ -166,15 +162,18 @@ class Header extends React.Component {
             {drawer}
           </Drawer>
         </Hidden>
-        {this.props.children}
+        <main className={classes.content}>
+          <div className={classes.toolbar} />
+          <Typography noWrap>{'You think water moves fast? You should see ice.'}</Typography>
+        </main>
       </div>
     );
   }
 }
 
-Header.propTypes = {
+ResponsiveDrawer.propTypes = {
   classes: PropTypes.object.isRequired,
   theme: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles, { withTheme: true })(Header);
+export default withStyles(styles, { withTheme: true })(ResponsiveDrawer);

@@ -8,10 +8,13 @@
     "build:prod": "webpack -p --env production",
     "dev-server": "webpack-dev-server",
     "test": "cross-env NODE_ENV=test jest --config=jest.config.json",
-    "start": "node server/server.js",
-    "heroku-postbuild": "yarn run build:prod"
+    "start": "npm run dev-server",
+    "now-start": "serve ./public",
+    "now-build": "npm run build:prod"
   },
   "dependencies": {
+    "@material-ui/core": "^1.5.0",
+    "@material-ui/icons": "^2.0.2",
     "babel-cli": "6.24.1",
     "babel-core": "6.25.0",
     "babel-loader": "7.1.1",
@@ -29,11 +32,13 @@
     "node-sass": "4.5.3",
     "normalize.css": "^7.0.0",
     "numeral": "2.0.6",
+    "prop-types": "^15.5.10",
     "raf": "3.3.2",
-    "react": "16.0.0",
+    "react": "^16.3.0",
     "react-addons-shallow-compare": "15.6.0",
     "react-dates": "12.7.0",
-    "react-dom": "16.0.0",
+    "react-dom": "^16.3.0",
+    "react-icons": "^2.2.5",
     "react-modal": "2.2.2",
     "react-redux": "5.0.5",
     "react-router-dom": "^4.2.2",
@@ -41,6 +46,8 @@
     "redux-mock-store": "1.2.3",
     "redux-thunk": "2.2.0",
     "sass-loader": "6.0.6",
+    "serve": "^9.6.0",
+    "socket.io": "^2.0.3",
     "style-loader": "0.18.2",
     "uuid": "^3.1.0",
     "validator": "^9.1.1",
@@ -55,5 +62,8 @@
     "jest": "20.0.4",
     "react-test-renderer": "16.0.0",
     "webpack-dev-server": "2.5.1"
+  },
+  "quokka": {
+    "babel": true
   }
 }

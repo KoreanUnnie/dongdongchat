@@ -1,43 +1,18 @@
-import "./styles/styles.scss";
-import "normalize.css/normalize.css";
-import "react-dates/lib/css/_datepicker.css";
-import { firebase } from "./firebase/firebase";
-import { login, logout } from "./actions/auth";
-import { Provider } from "react-redux";
-import AppRouter, { history } from "./routers/AppRouter";
-import configureStore from "./store/configureStore";
-import React, { Component } from "react";
-import ReactDOM from "react-dom";
-import LoadingPage from './components/LoadingPage';
+import React,{Component} from 'react';
+import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+import Layout from './components/Layout'
 
-const store = configureStore();
+const theme = createMuiTheme();
 
-const jsx = (
-  <Provider store={store}>
-    <AppRouter />
-  </Provider>
-);
+class App extends Component {
 
-let hasRendered = false;
-const renderApp = () => {
-  if (!hasRendered) {
-    ReactDOM.render(jsx, document.getElementById("app"));
-    hasRendered = true;
+  render() {
+    return (
+      <MuiThemeProvider theme={theme}>
+        <Layout />
+      </MuiThemeProvider>
+    );
   }
-};
-ReactDOM.render(<LoadingPage />, document.getElementById("app"));
+}
 
-
-firebase.auth().onAuthStateChanged(user => {
-  if (user) {
-    store.dispatch(login(user.uid));
-      renderApp();
-      if (history.location.pathname === "/") {
-        history.push("/dashboard");
-      }
-  } else {
-    store.dispatch(logout());
-    renderApp();
-    history.push("/");
-  }
-});
+export default App;
